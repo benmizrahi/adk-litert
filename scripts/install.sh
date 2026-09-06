@@ -75,5 +75,28 @@ if [ "$OS" = "linux" ]; then
     fi
 fi
 
+if [ "$OS" = "darwin" ]; then
+    LIB_PATH="$INSTALL_LIB_DIR/$LIB_NAME"
+
+    # The upstream macOS build ships with the Bazel-generated install name
+    # "@rpath/liblitert-lm.so", which does not match the .dylib file name and
+    # is not resolvable from a Go module cache. Rewrite it to the absolute
+    # install path so consumers link without needing any rpath entry.
+    if command -v install_name_tool >/dev/null 2>&1; then
+        echo "==> Rewriting install name to $LIB_PATH..."
+        chmod u+w "$LIB_PATH"
+        install_name_tool -id "$LIB_PATH" "$LIB_PATH"
+        # install_name_tool invalidates the ad-hoc signature on arm64.
+        if command -v codesign >/dev/null 2>&1; then
+            codesign --force --sign - "$LIB_PATH" >/dev/null 2>&1 || true
+        fi
+        chmod a-w "$LIB_PATH"
+    fi
+
+    # Compatibility alias for binaries already linked against
+    # "@rpath/liblitert-lm.so" before the install name was corrected.
+    ln -sf "$LIB_NAME" "$INSTALL_LIB_DIR/liblitert-lm.so"
+fi
+
 echo "==> Success! LiteRT-LM C runtime installed to $INSTALL_LIB_DIR"
 echo "==> Go packages can now import 'github.com/benmizrahi/adk-embedded-litert' and build with standard 'go build'."
