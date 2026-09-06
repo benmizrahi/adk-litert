@@ -10,7 +10,7 @@ import (
 	"google.golang.org/adk/v2/cmd/launcher"
 	"google.golang.org/adk/v2/cmd/launcher/full"
 
-	embeddedllm "adk-embedded-litert"
+	embeddedllm "github.com/benmizrahi/adk-embedded-litert"
 )
 
 func main() {

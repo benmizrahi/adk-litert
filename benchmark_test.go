@@ -5,7 +5,7 @@ import (
 	"os"
 	"testing"
 
-	embeddedllm "adk-embedded-litert"
+	embeddedllm "github.com/benmizrahi/adk-embedded-litert"
 	"google.golang.org/adk/v2/model"
 	"google.golang.org/genai"
 )

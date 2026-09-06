@@ -1,4 +1,4 @@
-module adk-embedded-litert
+module github.com/benmizrahi/adk-embedded-litert
 
 go 1.26.6
 

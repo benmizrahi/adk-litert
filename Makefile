@@ -30,6 +30,10 @@ setup: deps
 deps:
 	@./scripts/setup_deps.sh
 
+## install-deps: Installs LiteRT-LM runtime system-wide into /usr/local/lib (requires sudo)
+install-deps:
+	@sudo ./scripts/install.sh
+
 ## download-model: Downloads the Gemma 3 270M IT (q8) model from HuggingFace
 download-model:
 	@echo "==> Downloading gemma3-270m-it-q8.litertlm from HuggingFace..."

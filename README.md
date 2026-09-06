@@ -120,7 +120,7 @@ import (
 	"fmt"
 	"log"
 
-	embeddedllm "adk-embedded-litert"
+	embeddedllm "github.com/benmizrahi/adk-embedded-litert"
 	"google.golang.org/adk/v2/model"
 	"google.golang.org/genai"
 )
@@ -174,7 +174,7 @@ import (
 	"context"
 	"log"
 
-	embeddedllm "adk-embedded-litert"
+	embeddedllm "github.com/benmizrahi/adk-embedded-litert"
 	"google.golang.org/adk/v2/agent/llmagent"
 )
 
@@ -214,39 +214,30 @@ llm, err := model.NewLLM(ctx, "litert:/models/gemma-2b.litertlm")
 
 ---
 
-## Using in Other Go Projects
+## Using in Your Own Go Projects
 
-When importing `adk-embedded-litert` into an external Go project:
+### 1. Install the Native Runtime Dependency
+Because this package interfaces with Google's native LiteRT-LM C runtime, install the prebuilt shared library (`liblitert-lm.so` on Linux, `liblitert-lm.dylib` on macOS) using our one-line installer:
 
 ```bash
-go get github.com/google/adk-embedded-litert  # or your repository path
+curl -sSL https://raw.githubusercontent.com/benmizrahi/adk-embedded-litert/main/scripts/install.sh | sudo bash
 ```
 
-Because this package uses **Cgo** to interface with the native LiteRT C runtime, your build environment requires the native shared library (`liblitert-lm.so` on Linux, `liblitert-lm.dylib` on macOS).
+*(Or from a local clone: `sudo make install-deps`)*
 
-### 1. Library Resolution
+### 2. Add the Go Module
+In your Go application directory:
 
-Choose one of the following methods for downstream projects:
+```bash
+go get github.com/benmizrahi/adk-embedded-litert
+```
 
-- **Method A: Install to standard system library directory (Recommended)**
-  Copy `liblitert-lm.so` to `/usr/local/lib` and run `sudo ldconfig`:
-  ```bash
-  sudo cp /path/to/liblitert-lm.so /usr/local/lib/
-  sudo ldconfig
-  ```
-  Then downstream projects can run `go build` without extra flags.
+### 3. Build Your Application
+Because the native runtime and C++ headers are resolved automatically from standard paths (`/usr/local/lib`), you can build your application with standard Go commands:
 
-- **Method B: Supply CGO environment flags at build time**
-  Point Cgo to your local `lib/` directory:
-  ```bash
-  export CGO_ENABLED=1
-  export CGO_LDFLAGS="-L/path/to/adk-embedded-litert/lib -Wl,-rpath,/path/to/adk-embedded-litert/lib -llitert-lm -lstdc++"
-  export LD_LIBRARY_PATH="/path/to/adk-embedded-litert/lib:$LD_LIBRARY_PATH"
-  go build .
-  ```
-
-- **Method C: Vendored prebuilts inside the repository**
-  Place prebuilt libraries inside `internal/model/litert/prebuilt/linux_amd64/` with relative `#cgo` pragmas so `go get` downloads the binaries alongside the Go package.
+```bash
+go build .
+```
 
 ---
 

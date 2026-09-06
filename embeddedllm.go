@@ -3,7 +3,7 @@
 //
 // Usage:
 //
-//	import "adk-embedded-litert" // or "github.com/.../adk-embedded-litert"
+//	import "github.com/benmizrahi/adk-embedded-litert"
 //
 //	model, err := embeddedllm.NewModel(ctx, embeddedllm.DefaultConfig("/path/to/model.litertlm"))
 package embeddedllm
@@ -11,7 +11,7 @@ package embeddedllm
 import (
 	"context"
 
-	"adk-embedded-litert/internal/model/litert"
+	"github.com/benmizrahi/adk-embedded-litert/internal/model/litert"
 )
 
 // Hardware acceleration backend.

@@ -1,8 +1,8 @@
 package litert
 
 /*
-#cgo CXXFLAGS: -std=c++17 -I${SRCDIR} -I${SRCDIR}/csrc -I${SRCDIR}/../../../include
-#cgo LDFLAGS: -L${SRCDIR}/../../../lib -Wl,-rpath,${SRCDIR}/../../../lib -llitert-lm -lstdc++
+#cgo CXXFLAGS: -std=c++17 -I${SRCDIR} -I${SRCDIR}/csrc -I${SRCDIR}/../../../include -I/usr/local/include
+#cgo LDFLAGS: -L${SRCDIR}/../../../lib -Wl,-rpath,${SRCDIR}/../../../lib -L/usr/local/lib -Wl,-rpath,/usr/local/lib -llitert-lm -lstdc++
 #include "litert_lm_c_api.h"
 #include <stdlib.h>
 

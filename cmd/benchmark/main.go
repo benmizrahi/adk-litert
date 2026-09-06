@@ -8,8 +8,8 @@ import (
 	"os"
 	"strings"
 
-	embeddedllm "adk-embedded-litert"
-	"adk-embedded-litert/pkg/benchmark"
+	embeddedllm "github.com/benmizrahi/adk-embedded-litert"
+	"github.com/benmizrahi/adk-embedded-litert/pkg/benchmark"
 )
 
 func main() {

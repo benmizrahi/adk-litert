@@ -1,5 +1,11 @@
 #include "litert_lm_c_api.h"
+#if __has_include("csrc/engine.h")
+#include "csrc/engine.h"
+#elif __has_include("engine.h")
+#include "engine.h"
+#else
 #include "../../../include/engine.h"
+#endif
 
 #include <cstdlib>
 #include <cstring>
