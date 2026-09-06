@@ -1,5 +1,6 @@
-// Package embeddedllm provides an in-memory LiteRT-LM model implementation
-// for the Google Agent Development Kit (ADK v2).
+// Package embeddedllm provides a low-latency, in-memory LiteRT-LM model engine
+// for the Google Agent Development Kit (ADK v2), built for scalable and real-time
+// in-process inference in Go.
 //
 // Usage:
 //

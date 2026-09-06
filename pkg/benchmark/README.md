@@ -1,6 +1,6 @@
 # LiteRT-LM Performance & TTFT Benchmarking
 
-This package provides an end-to-end inference benchmarking suite for on-device [LiteRT-LM](https://github.com/google-ai-edge/LiteRT-LM) models integrated with Go and the [Google Agent Development Kit (ADK v2)](https://github.com/google/adk).
+This package provides an end-to-end performance benchmarking suite for in-memory [LiteRT-LM](https://github.com/google-ai-edge/LiteRT-LM) models integrated with Go and the [Google Agent Development Kit (ADK v2)](https://github.com/google/adk), measuring real-time inference latency, TTFT, and throughput for scalable in-process workloads.
 
 ---
 
