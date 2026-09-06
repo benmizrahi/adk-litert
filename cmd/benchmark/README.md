@@ -10,10 +10,10 @@ For full benchmark results, metric definitions, and JSON schemas, see [**`pkg/be
 
 ```bash
 # Build and run default benchmark
-make bench MODEL_PATH="./tiny_garden.litertlm"
+make bench MODEL_PATH="./gemma3-270m-it-q8.litertlm"
 
 # Run multi-prompt workload suite
-make bench-suite MODEL_PATH="./tiny_garden.litertlm"
+make bench-suite MODEL_PATH="./gemma3-270m-it-q8.litertlm"
 ```
 
 ## CLI Usage
@@ -23,10 +23,10 @@ make bench-suite MODEL_PATH="./tiny_garden.litertlm"
 make build-bench
 
 # Run with custom options
-./bin/benchmark -model="./tiny_garden.litertlm" -backend=cpu -runs=5 -warmup=1 -prompt="Your prompt here"
+./bin/benchmark -model="./gemma3-270m-it-q8.litertlm" -backend=cpu -runs=5 -warmup=1 -prompt="Your prompt here"
 
 # Export structured JSON
-./bin/benchmark -model="./tiny_garden.litertlm" -runs=5 -json -output="results.json"
+./bin/benchmark -model="./gemma3-270m-it-q8.litertlm" -runs=5 -json -output="results.json"
 ```
 
 ## Benchmark Metrics Summary

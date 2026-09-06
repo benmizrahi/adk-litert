@@ -45,7 +45,7 @@ It allows you to run on-device, low-latency Large Language Models (such as Gemma
 
 ### 2. Download a Model
 
-You can use the lightweight sample model [`tiny_garden.litertlm`](https://huggingface.co/google/gemma-3-270m-it/blob/main/tiny_garden.litertlm) from Google's [gemma-3-270m-it](https://huggingface.co/google/gemma-3-270m-it) repository on Hugging Face:
+You can use the official quantized model [`gemma3-270m-it-q8.litertlm`](https://huggingface.co/litert-community/gemma-3-270m-it/blob/main/gemma3-270m-it-q8.litertlm) from the [litert-community/gemma-3-270m-it](https://huggingface.co/litert-community/gemma-3-270m-it/) repository on Hugging Face:
 
 **Via Make:**
 ```bash
@@ -55,10 +55,10 @@ make download-model
 
 **Or via curl:**
 ```bash
-# If the model requires Hugging Face authentication:
+# Hugging Face authentication token for gated model access:
 export HF_TOKEN="your_huggingface_token"
 
-curl -L -H "Authorization: Bearer $HF_TOKEN" -o tiny_garden.litertlm "https://huggingface.co/google/gemma-3-270m-it/resolve/main/tiny_garden.litertlm"
+curl -L -H "Authorization: Bearer $HF_TOKEN" -o gemma3-270m-it-q8.litertlm "https://huggingface.co/litert-community/gemma-3-270m-it/resolve/main/gemma3-270m-it-q8.litertlm"
 ```
 
 ---
@@ -82,13 +82,13 @@ The output binary will be generated at `bin/agent`.
 Run the agent in console chat mode:
 
 ```bash
-make run MODEL_PATH="./tiny_garden.litertlm"
+make run MODEL_PATH="./gemma3-270m-it-q8.litertlm"
 ```
 
 Or run directly:
 
 ```bash
-LITERT_MODEL_PATH="./tiny_garden.litertlm" ./bin/agent console
+LITERT_MODEL_PATH="./gemma3-270m-it-q8.litertlm" ./bin/agent console
 ```
 
 #### Web UI Mode
@@ -96,7 +96,7 @@ LITERT_MODEL_PATH="./tiny_garden.litertlm" ./bin/agent console
 Launch the ADK Web Chat UI on `http://localhost:8080`:
 
 ```bash
-LITERT_MODEL_PATH="./tiny_garden.litertlm" ./bin/agent web webui api
+LITERT_MODEL_PATH="./gemma3-270m-it-q8.litertlm" ./bin/agent web webui api
 ```
 
 ---
@@ -257,7 +257,7 @@ The project includes an inference performance benchmarking suite designed to mea
 
 See [**`pkg/benchmark/README.md`**](pkg/benchmark/README.md) for detailed metrics and JSON schemas.
 
-### Sample Measured Results (`tiny_garden.litertlm` on CPU)
+### Sample Measured Results (`gemma3-270m-it-q8.litertlm` on CPU)
 
 | Metric | Min | Mean | Median (P50) | P90 | P95 | Max |
 | :--- | :---: | :---: | :---: | :---: | :---: | :---: |
@@ -274,13 +274,13 @@ Run the standard benchmark against your model:
 
 ```bash
 # Run benchmark on CPU
-make bench MODEL_PATH="./tiny_garden.litertlm"
+make bench MODEL_PATH="./gemma3-270m-it-q8.litertlm"
 
 # Run benchmark with GPU acceleration
-make bench MODEL_PATH="./tiny_garden.litertlm" BACKEND=gpu
+make bench MODEL_PATH="./gemma3-270m-it-q8.litertlm" BACKEND=gpu
 
 # Or run the benchmark binary directly with custom options
-./bin/benchmark -model="./tiny_garden.litertlm" -backend=gpu -runs=5 -warmup=1
+./bin/benchmark -model="./gemma3-270m-it-q8.litertlm" -backend=gpu -runs=5 -warmup=1
 ```
 
 #### Multi-Prompt Workload Suite
@@ -288,16 +288,16 @@ Benchmark across different workload scenarios (short query, medium conversationa
 
 ```bash
 # Multi-prompt suite on GPU
-make bench-suite MODEL_PATH="./tiny_garden.litertlm" BACKEND=gpu
+make bench-suite MODEL_PATH="./gemma3-270m-it-q8.litertlm" BACKEND=gpu
 ```
 
 #### Custom Prompts & JSON Export
 ```bash
 # Benchmark a custom prompt
-./bin/benchmark -model="./tiny_garden.litertlm" -prompt="Summarize the history of AI in 3 bullet points."
+./bin/benchmark -model="./gemma3-270m-it-q8.litertlm" -prompt="Summarize the history of AI in 3 bullet points."
 
 # Export structured JSON results (for CI/CD regression tracking or plotting)
-./bin/benchmark -model="./tiny_garden.litertlm" -runs=5 -json -output=bench_results.json
+./bin/benchmark -model="./gemma3-270m-it-q8.litertlm" -runs=5 -json -output=bench_results.json
 ```
 
 ### Running Go Standard Benchmarks
@@ -322,7 +322,7 @@ go test -bench=. -benchmem -v ./...
 | `make bench-suite` | Runs multi-prompt comprehensive workload benchmark suite |
 | `make test-bench` | Runs standard Go test benchmark suite (`go test -bench`) |
 | `make setup` | Explicitly downloads and extracts LiteRT-LM prebuilts |
-| `make download-model` | Downloads sample `tiny_garden.litertlm` from Hugging Face |
+| `make download-model` | Downloads Gemma 3 270M IT (q8) model from Hugging Face |
 | `make run` | Runs `bin/agent` in console mode with `MODEL_PATH` |
 | `make test` | Runs Go test suite |
 | `make tidy` | Runs `go mod tidy` |
@@ -334,4 +334,11 @@ go test -bench=. -benchmem -v ./...
 ## License
 
 Apache 2.0
+
+---
+
+## Disclaimer
+
+> **Disclaimer**: This code is provided "as-is" as a demonstration only to illustrate a potential solution. The code does not constitute a Google product or service of any kind, and Google offers no support, warranties, or liability of any kind with its regard. Whoever chooses to use this code accepts all responsibility related to it, including for its implementation, use, and ongoing maintenance. For the avoidance of doubt, this code is not eligible for the Google Open Source Software Vulnerability Rewards Program.
+
 

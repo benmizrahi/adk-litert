@@ -23,6 +23,8 @@ LiteRT-LM/
 *.bin
 *.xnnpack_cache*
 model.litertlm
+gemma3-270m-it-q8.litertlm
+tiny_garden.litertlm
 
 # Test and coverage artifacts
 *.coverprofile

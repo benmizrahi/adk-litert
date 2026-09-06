@@ -14,7 +14,9 @@ func getTestModel(b *testing.B) *embeddedllm.Model {
 	b.Helper()
 	modelPath := os.Getenv("LITERT_MODEL_PATH")
 	if modelPath == "" {
-		if _, err := os.Stat("tiny_garden.litertlm"); err == nil {
+		if _, err := os.Stat("gemma3-270m-it-q8.litertlm"); err == nil {
+			modelPath = "gemma3-270m-it-q8.litertlm"
+		} else if _, err := os.Stat("tiny_garden.litertlm"); err == nil {
 			modelPath = "tiny_garden.litertlm"
 		} else if _, err := os.Stat("model.litertlm"); err == nil {
 			modelPath = "model.litertlm"

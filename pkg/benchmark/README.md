@@ -6,14 +6,14 @@ This package provides an end-to-end inference benchmarking suite for on-device [
 
 ## 📊 Measured Benchmark Results
 
-The following metrics were collected on an **AMD EPYC 7B12 CPU** using the sample [`tiny_garden.litertlm`](https://huggingface.co/google/functiongemma-270m-it) model on Linux (x86_64).
+The following metrics were collected on an **AMD EPYC 7B12 CPU** using the [`gemma3-270m-it-q8.litertlm`](https://huggingface.co/litert-community/gemma-3-270m-it/blob/main/gemma3-270m-it-q8.litertlm) model from [litert-community/gemma-3-270m-it](https://huggingface.co/litert-community/gemma-3-270m-it/) on Linux (x86_64).
 
 ### Standard Prompt Benchmark
 
 - **Prompt**: `"Explain the theory of general relativity in 3 concise bullet points."`
 - **Runs**: 1 warmup run, 5 measured runs
 - **Backend**: CPU (XNNPACK delegate)
-- **Model Size**: ~270M Parameters (`tiny_garden.litertlm`)
+- **Model Size**: ~270M Parameters (`gemma3-270m-it-q8.litertlm`)
 
 | Metric | Min | Mean | Median (P50) | P90 | P95 | Max |
 | :--- | :---: | :---: | :---: | :---: | :---: | :---: |
@@ -47,10 +47,10 @@ The following metrics were collected on an **AMD EPYC 7B12 CPU** using the sampl
 
 ```bash
 # Run standard benchmark (1 warmup + 5 measured runs)
-make bench MODEL_PATH="./tiny_garden.litertlm"
+make bench MODEL_PATH="./gemma3-270m-it-q8.litertlm"
 
 # Run multi-prompt workload suite (Short, Medium, Code/Reasoning)
-make bench-suite MODEL_PATH="./tiny_garden.litertlm"
+make bench-suite MODEL_PATH="./gemma3-270m-it-q8.litertlm"
 
 # Run native Go testing benchmarks (testing.B)
 make test-bench
@@ -66,13 +66,13 @@ make build-bench
 Execute with custom flags:
 ```bash
 # Benchmark custom prompt on CPU with 10 iterations
-./bin/benchmark -model="./tiny_garden.litertlm" -backend=cpu -runs=10 -warmup=2 -prompt="List the 7 wonders of the ancient world."
+./bin/benchmark -model="./gemma3-270m-it-q8.litertlm" -backend=cpu -runs=10 -warmup=2 -prompt="List the 7 wonders of the ancient world."
 
 # Benchmark using prompt from a file
-./bin/benchmark -model="./tiny_garden.litertlm" -prompt-file="prompt.txt"
+./bin/benchmark -model="./gemma3-270m-it-q8.litertlm" -prompt-file="prompt.txt"
 
 # Export structured JSON report for CI/CD tracking
-./bin/benchmark -model="./tiny_garden.litertlm" -runs=5 -json -output="benchmark_results.json"
+./bin/benchmark -model="./gemma3-270m-it-q8.litertlm" -runs=5 -json -output="benchmark_results.json"
 ```
 
 ### CLI Flag Reference
@@ -100,7 +100,7 @@ When `-json` is specified, the benchmark outputs structured telemetry suitable f
 {
   "model_name": "LiteRT-LM",
   "backend": "cpu",
-  "model_path": "./tiny_garden.litertlm",
+  "model_path": "./gemma3-270m-it-q8.litertlm",
   "warmup_runs": 1,
   "measured_runs": 5,
   "prompt_summary": "Explain the theory of general relativity in 3 concise bullet points.",

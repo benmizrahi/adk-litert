@@ -18,7 +18,11 @@ func main() {
 
 	modelPath := os.Getenv("LITERT_MODEL_PATH")
 	if modelPath == "" {
-		modelPath = "model.litertlm"
+		if _, err := os.Stat("gemma3-270m-it-q8.litertlm"); err == nil {
+			modelPath = "gemma3-270m-it-q8.litertlm"
+		} else {
+			modelPath = "model.litertlm"
+		}
 	}
 
 	// 1. Initialize Embedded In-Memory LiteRT-LM Model

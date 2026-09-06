@@ -30,19 +30,19 @@ setup: deps
 deps:
 	@./scripts/setup_deps.sh
 
-## download-model: Downloads the sample FunctionGemma / tiny_garden model from HuggingFace
+## download-model: Downloads the Gemma 3 270M IT (q8) model from HuggingFace
 download-model:
-	@echo "==> Downloading tiny_garden.litertlm from HuggingFace..."
+	@echo "==> Downloading gemma3-270m-it-q8.litertlm from HuggingFace..."
 	@TOKEN="$${HF_TOKEN:-$(HF_TOKEN)}"; \
 	if [ -n "$$TOKEN" ]; then \
 		echo "==> Authenticating download with HF_TOKEN..."; \
-		curl -f -L -H "Authorization: Bearer $$TOKEN" -o tiny_garden.litertlm "https://huggingface.co/google/functiongemma-270m-it/resolve/main/tiny_garden.litertlm" || { rm -f tiny_garden.litertlm; echo "Error: Failed to download model. Please verify your HF_TOKEN."; exit 1; }; \
+		curl -f -L -H "Authorization: Bearer $$TOKEN" -o gemma3-270m-it-q8.litertlm "https://huggingface.co/litert-community/gemma-3-270m-it/resolve/main/gemma3-270m-it-q8.litertlm" || { rm -f gemma3-270m-it-q8.litertlm; echo "Error: Failed to download model. Please verify your HF_TOKEN."; exit 1; }; \
 	else \
 		echo "==> No HF_TOKEN provided; downloading without auth (gated repos may fail)..."; \
-		curl -f -L -o tiny_garden.litertlm "https://huggingface.co/google/functiongemma-270m-it/resolve/main/tiny_garden.litertlm" || { rm -f tiny_garden.litertlm; echo "Error: Failed to download model. HuggingFace requires authentication for gated models. Please set HF_TOKEN (e.g. export HF_TOKEN=... or make download-model HF_TOKEN=...)."; exit 1; }; \
+		curl -f -L -o gemma3-270m-it-q8.litertlm "https://huggingface.co/litert-community/gemma-3-270m-it/resolve/main/gemma3-270m-it-q8.litertlm" || { rm -f gemma3-270m-it-q8.litertlm; echo "Error: Failed to download model. HuggingFace requires authentication for gated models. Please set HF_TOKEN (e.g. export HF_TOKEN=... or make download-model HF_TOKEN=...)."; exit 1; }; \
 	fi
-	@ln -sf tiny_garden.litertlm model.litertlm
-	@echo "==> Model saved to tiny_garden.litertlm and linked to model.litertlm"
+	@ln -sf gemma3-270m-it-q8.litertlm model.litertlm
+	@echo "==> Model saved to gemma3-270m-it-q8.litertlm and linked to model.litertlm"
 
 ## build: Compiles the Go ADK application (cmd/agent)
 build: deps
