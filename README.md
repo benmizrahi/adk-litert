@@ -1,5 +1,12 @@
 # adk-embedded-litert
 
+[![Go Reference](https://pkg.go.dev/badge/github.com/benmizrahi/adk-embedded-litert.svg)](https://pkg.go.dev/github.com/benmizrahi/adk-embedded-litert)
+[![Go Version](https://img.shields.io/badge/Go-%3E%3D1.22-00ADD8?logo=go&logoColor=white)](https://golang.org)
+[![Google ADK](https://img.shields.io/badge/Google_ADK-v2-4285F4?logo=google&logoColor=white)](https://github.com/google/adk)
+[![LiteRT-LM](https://img.shields.io/badge/LiteRT--LM-v0.16.0-34A853)](https://github.com/google-ai-edge/LiteRT-LM)
+[![Model](https://img.shields.io/badge/Model-Gemma_3_270M-FF6F00?logo=huggingface&logoColor=white)](https://huggingface.co/litert-community/gemma-3-270m-it)
+[![Platform](https://img.shields.io/badge/Platform-Linux_%7C_macOS-lightgrey)]()
+
 **adk-embedded-litert** is an in-memory [LiteRT-LM](https://github.com/google-ai-edge/LiteRT-LM) model engine and [Google Agent Development Kit (ADK v2)](https://github.com/google/adk) integration in Go.
 
 It allows you to run on-device, low-latency Large Language Models (such as Gemma, Gemma 2, and other `.litertlm` models) entirely in-memory within your Go applications and ADK agents.
