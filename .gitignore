@@ -1,0 +1,52 @@
+# Binaries and build outputs
+bin/
+*.exe
+*.exe~
+*.dll
+*.so
+*.so.*
+*.dylib
+*.a
+*.o
+*.obj
+
+# LiteRT-LM Prebuilts & Dependencies (automatically fetched via make deps)
+lib/
+include/
+LiteRT-LM/
+
+# Model assets and caches
+*.litertlm
+*.litertlm.*
+*.tflite
+*.safetensors
+*.bin
+*.xnnpack_cache*
+model.litertlm
+
+# Test and coverage artifacts
+*.coverprofile
+*.out
+coverage.txt
+
+# OS & IDE artifacts
+.DS_Store
+.vscode/
+!.vscode/settings.json
+!.vscode/tasks.json
+.idea/
+*.swp
+*.swo
+*~
+
+# Environment & Secrets
+.env
+.env.local
+*.pem
+*.key
+
+# Temporary files
+/tmp/
+*.tmp
+*.zip
+*.tar.gz

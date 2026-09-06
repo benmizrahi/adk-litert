@@ -1,0 +1,337 @@
+# adk-embedded-litert
+
+**adk-embedded-litert** is an in-memory [LiteRT-LM](https://github.com/google-ai-edge/LiteRT-LM) model engine and [Google Agent Development Kit (ADK v2)](https://github.com/google/adk) integration in Go.
+
+It allows you to run on-device, low-latency Large Language Models (such as Gemma, Gemma 2, and other `.litertlm` models) entirely in-memory within your Go applications and ADK agents.
+
+---
+
+## Features
+
+- **ADK v2 Native**: Implements Google ADK's `model.LLM` interface with full support for unary and streaming generation (`iter.Seq2`).
+- **In-Memory & Embedded**: Runs inference locally via Cgo and the high-performance LiteRT C API with no separate daemon or microservice required.
+- **Automated Prebuilts**: Uses official Google LiteRT C API prebuilts (`liblitert-lm.so`) fetched automatically during build—no need to compile TensorFlow or C++ from source with Bazel.
+- **Hardware Acceleration**: Supports both CPU and GPU execution backends.
+- **Model Registry**: Enables declarative model resolution using ADK's registry format: `model.NewLLM(ctx, "litert:/path/to/model.litertlm")`.
+
+---
+
+## Project Structure
+
+```
+├── cmd/
+│   └── agent/
+│       └── main.go          # Example ADK agent using embedded LiteRT-LM
+├── internal/
+│   └── model/
+│       └── litert/          # Cgo wrapper and ADK model.LLM implementation
+├── scripts/
+│   └── setup_deps.sh        # Automated fetcher for LiteRT prebuilts
+├── embeddedllm.go           # Public Go API surface
+├── Makefile                 # Build & run automation
+├── go.mod                   # Go module definitions
+└── README.md
+```
+
+---
+
+## Quick Start
+
+### 1. Prerequisites
+
+- **Go**: Version 1.22+ (configured with Go 1.26+)
+- **GCC / G++**: For Cgo linking (`sudo apt install build-essential`)
+- **curl & unzip**: For downloading official prebuilt runtime libraries
+
+### 2. Download a Model
+
+You can use the lightweight sample model [`tiny_garden.litertlm`](https://huggingface.co/google/gemma-3-270m-it/blob/main/tiny_garden.litertlm) from Google's [gemma-3-270m-it](https://huggingface.co/google/gemma-3-270m-it) repository on Hugging Face:
+
+**Via Make:**
+```bash
+export HF_TOKEN="your_huggingface_token"
+make download-model
+```
+
+**Or via curl:**
+```bash
+# If the model requires Hugging Face authentication:
+export HF_TOKEN="your_huggingface_token"
+
+curl -L -H "Authorization: Bearer $HF_TOKEN" -o tiny_garden.litertlm "https://huggingface.co/google/gemma-3-270m-it/resolve/main/tiny_garden.litertlm"
+```
+
+---
+
+### 3. Build
+
+Run `make build` to automatically fetch LiteRT runtime dependencies and compile the binary:
+
+```bash
+make build
+```
+
+The output binary will be generated at `bin/agent`.
+
+---
+
+### 4. Run & Interact with the Agent
+
+#### Interactive Console Mode
+
+Run the agent in console chat mode:
+
+```bash
+make run MODEL_PATH="./tiny_garden.litertlm"
+```
+
+Or run directly:
+
+```bash
+LITERT_MODEL_PATH="./tiny_garden.litertlm" ./bin/agent console
+```
+
+#### Web UI Mode
+
+Launch the ADK Web Chat UI on `http://localhost:8080`:
+
+```bash
+LITERT_MODEL_PATH="./tiny_garden.litertlm" ./bin/agent web webui api
+```
+
+---
+
+## Go API Usage
+
+### Direct Initialization
+
+```go
+package main
+
+import (
+	"context"
+	"fmt"
+	"log"
+
+	embeddedllm "adk-embedded-litert"
+	"google.golang.org/adk/v2/model"
+	"google.golang.org/genai"
+)
+
+func main() {
+	ctx := context.Background()
+
+	// 1. Configure the model
+	cfg := embeddedllm.DefaultConfig("/path/to/model.litertlm")
+	cfg.ModelName = "gemma-2b-local"
+	cfg.Backend = embeddedllm.BackendCPU // or embeddedllm.BackendGPU
+	cfg.MaxSeqLen = 2048
+
+	// 2. Load model into memory
+	llm, err := embeddedllm.NewModel(ctx, cfg)
+	if err != nil {
+		log.Fatalf("Failed to load model: %v", err)
+	}
+	defer llm.Close()
+
+	// 3. Generate response (streaming)
+	req := &model.LLMRequest{
+		Contents: []*genai.Content{
+			{
+				Role: "user",
+				Parts: []*genai.Part{
+					{Text: "Explain quantum computing in one short sentence."},
+				},
+			},
+		},
+	}
+
+	for resp, err := range llm.GenerateContent(ctx, req, true) {
+		if err != nil {
+			log.Fatalf("Generation error: %v", err)
+		}
+		for _, part := range resp.Content.Parts {
+			fmt.Print(part.Text)
+		}
+	}
+	fmt.Println()
+}
+```
+
+### Using with Google ADK Agents
+
+```go
+package main
+
+import (
+	"context"
+	"log"
+
+	embeddedllm "adk-embedded-litert"
+	"google.golang.org/adk/v2/agent/llmagent"
+)
+
+func main() {
+	ctx := context.Background()
+
+	cfg := embeddedllm.DefaultConfig("/path/to/model.litertlm")
+	modelInstance, err := embeddedllm.NewModel(ctx, cfg)
+	if err != nil {
+		log.Fatalf("Model load failed: %v", err)
+	}
+	defer modelInstance.Close()
+
+	agent, err := llmagent.New(llmagent.Config{
+		Name:        "on_device_assistant",
+		Model:       modelInstance,
+		Description: "Local on-device agent powered by LiteRT-LM.",
+		Instruction: "You are an intelligent assistant running on-device.",
+	})
+	if err != nil {
+		log.Fatalf("Failed to create ADK agent: %v", err)
+	}
+
+	_ = agent
+}
+```
+
+### Using ADK Model Registry
+
+```go
+// Register litert model scheme
+embeddedllm.Register("^(?i)litert:.*", embeddedllm.DefaultConfig(""))
+
+// Anywhere in your application:
+llm, err := model.NewLLM(ctx, "litert:/models/gemma-2b.litertlm")
+```
+
+---
+
+## Using in Other Go Projects
+
+When importing `adk-embedded-litert` into an external Go project:
+
+```bash
+go get github.com/google/adk-embedded-litert  # or your repository path
+```
+
+Because this package uses **Cgo** to interface with the native LiteRT C runtime, your build environment requires the native shared library (`liblitert-lm.so` on Linux, `liblitert-lm.dylib` on macOS).
+
+### 1. Library Resolution
+
+Choose one of the following methods for downstream projects:
+
+- **Method A: Install to standard system library directory (Recommended)**
+  Copy `liblitert-lm.so` to `/usr/local/lib` and run `sudo ldconfig`:
+  ```bash
+  sudo cp /path/to/liblitert-lm.so /usr/local/lib/
+  sudo ldconfig
+  ```
+  Then downstream projects can run `go build` without extra flags.
+
+- **Method B: Supply CGO environment flags at build time**
+  Point Cgo to your local `lib/` directory:
+  ```bash
+  export CGO_ENABLED=1
+  export CGO_LDFLAGS="-L/path/to/adk-embedded-litert/lib -Wl,-rpath,/path/to/adk-embedded-litert/lib -llitert-lm -lstdc++"
+  export LD_LIBRARY_PATH="/path/to/adk-embedded-litert/lib:$LD_LIBRARY_PATH"
+  go build .
+  ```
+
+- **Method C: Vendored prebuilts inside the repository**
+  Place prebuilt libraries inside `internal/model/litert/prebuilt/linux_amd64/` with relative `#cgo` pragmas so `go get` downloads the binaries alongside the Go package.
+
+---
+
+---
+
+## Performance & TTFT Benchmarking
+
+The project includes an inference performance benchmarking suite designed to measure critical LLM latency and throughput metrics:
+
+- **TTFT (Time To First Token)**: Latency from prompt submission to the first generated token chunk (measures prefill speed and initial response responsiveness).
+- **Decode Speed**: Generation throughput in tokens per second (`(Tokens - 1) / Decode Duration`).
+- **Inter-Token Latency (ITL / TPOT)**: Time between consecutive streamed tokens (Mean, P50, P90, P95, P99).
+- **Total Latency**: End-to-end duration from prompt to final turn token.
+- **Memory Footprint**: Process Resident RSS and Go Heap usage before and during generation.
+
+See [**`pkg/benchmark/README.md`**](pkg/benchmark/README.md) for detailed metrics and JSON schemas.
+
+### Sample Measured Results (`tiny_garden.litertlm` on CPU)
+
+| Metric | Min | Mean | Median (P50) | P90 | P95 | Max |
+| :--- | :---: | :---: | :---: | :---: | :---: | :---: |
+| **TTFT (Time To First Token)** | **90.58 ms** | **127.77 ms** | **125.99 ms** | **152.86 ms** | **161.20 ms** | **169.53 ms** |
+| **Decode Speed (TPS)** | **42.83 tok/s** | **45.09 tok/s** | **45.91 tok/s** | **46.31 tok/s** | **46.33 tok/s** | **46.36 tok/s** |
+| **Total Latency** | 1,831.98 ms | 1,881.48 ms | 1,881.13 ms | 1,938.30 ms | 1,954.30 ms | 1,970.31 ms |
+| **Inter-Token Latency (ITL)** | 21.31 ms | 21.88 ms | 21.46 ms | 22.66 ms | 22.76 ms | 22.86 ms |
+| **Overall Throughput** | 40.60 tok/s | 42.55 tok/s | 42.53 tok/s | 43.65 tok/s | 43.66 tok/s | 43.67 tok/s |
+| **Resident RSS Memory** | — | **471.73 MB** | — | — | — | — |
+
+### Running Benchmarks via CLI
+
+Run the standard benchmark against your model:
+
+```bash
+# Run benchmark on CPU
+make bench MODEL_PATH="./tiny_garden.litertlm"
+
+# Run benchmark with GPU acceleration
+make bench MODEL_PATH="./tiny_garden.litertlm" BACKEND=gpu
+
+# Or run the benchmark binary directly with custom options
+./bin/benchmark -model="./tiny_garden.litertlm" -backend=gpu -runs=5 -warmup=1
+```
+
+#### Multi-Prompt Workload Suite
+Benchmark across different workload scenarios (short query, medium conversational response, and reasoning / code generation):
+
+```bash
+# Multi-prompt suite on GPU
+make bench-suite MODEL_PATH="./tiny_garden.litertlm" BACKEND=gpu
+```
+
+#### Custom Prompts & JSON Export
+```bash
+# Benchmark a custom prompt
+./bin/benchmark -model="./tiny_garden.litertlm" -prompt="Summarize the history of AI in 3 bullet points."
+
+# Export structured JSON results (for CI/CD regression tracking or plotting)
+./bin/benchmark -model="./tiny_garden.litertlm" -runs=5 -json -output=bench_results.json
+```
+
+### Running Go Standard Benchmarks
+
+You can also run native Go benchmarks via `testing.B`:
+
+```bash
+make test-bench
+# Or directly:
+go test -bench=. -benchmem -v ./...
+```
+
+---
+
+## Makefile Commands
+
+| Command | Description |
+| :--- | :--- |
+| `make build` | Automatically fetches runtime dependencies and builds `bin/agent` |
+| `make build-bench` | Compiles the TTFT & inference benchmark CLI (`bin/benchmark`) |
+| `make bench` | Runs TTFT and performance benchmarks with default workload |
+| `make bench-suite` | Runs multi-prompt comprehensive workload benchmark suite |
+| `make test-bench` | Runs standard Go test benchmark suite (`go test -bench`) |
+| `make setup` | Explicitly downloads and extracts LiteRT-LM prebuilts |
+| `make download-model` | Downloads sample `tiny_garden.litertlm` from Hugging Face |
+| `make run` | Runs `bin/agent` in console mode with `MODEL_PATH` |
+| `make test` | Runs Go test suite |
+| `make tidy` | Runs `go mod tidy` |
+| `make clean` | Cleans build artifacts (`bin/`) |
+| `make help` | Displays available make targets and override options |
+
+---
+
+## License
+
+Apache 2.0
+
