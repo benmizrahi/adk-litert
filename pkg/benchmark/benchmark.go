@@ -17,21 +17,21 @@ import (
 
 // IterationResult stores metrics for a single generation run.
 type IterationResult struct {
-	IterationIndex int           `json:"iteration"`
-	Prompt         string        `json:"prompt"`
-	ResponseText   string        `json:"response_text"`
-	PromptChars    int           `json:"prompt_chars"`
-	OutputTokens   int           `json:"output_tokens"`
-	OutputChars    int           `json:"output_chars"`
+	IterationIndex int    `json:"iteration"`
+	Prompt         string `json:"prompt"`
+	ResponseText   string `json:"response_text"`
+	PromptChars    int    `json:"prompt_chars"`
+	OutputTokens   int    `json:"output_tokens"`
+	OutputChars    int    `json:"output_chars"`
 
 	// Timing metrics
 	TTFT           time.Duration `json:"ttft_ns"`            // Time To First Token
-	TotalDuration  time.Duration `json:"total_duration_ns"`   // Total generation duration
-	DecodeDuration time.Duration `json:"decode_duration_ns"`  // TotalDuration - TTFT
+	TotalDuration  time.Duration `json:"total_duration_ns"`  // Total generation duration
+	DecodeDuration time.Duration `json:"decode_duration_ns"` // TotalDuration - TTFT
 
 	// Throughput
-	TokensPerSec       float64       `json:"tokens_per_sec"`        // OutputTokens / TotalDuration (in sec)
-	DecodeTokensPerSec float64       `json:"decode_tokens_per_sec"` // (OutputTokens - 1) / DecodeDuration (in sec)
+	TokensPerSec       float64 `json:"tokens_per_sec"`        // OutputTokens / TotalDuration (in sec)
+	DecodeTokensPerSec float64 `json:"decode_tokens_per_sec"` // (OutputTokens - 1) / DecodeDuration (in sec)
 
 	// Inter-Token Latencies
 	MeanITL time.Duration   `json:"mean_itl_ns"` // Mean Inter-Token Latency
@@ -390,4 +390,3 @@ func truncateString(s string, maxLen int) string {
 	}
 	return s[:maxLen-3] + "..."
 }
-
