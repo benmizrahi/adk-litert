@@ -1,16 +1,16 @@
-package embeddedllm_test
+package litert_test
 
 import (
 	"context"
 	"os"
 	"testing"
 
-	embeddedllm "github.com/benmizrahi/adk-embedded-litert"
+	"github.com/benmizrahi/adk-litert"
 	"google.golang.org/adk/v2/model"
 	"google.golang.org/genai"
 )
 
-func getTestModel(b *testing.B) *embeddedllm.Model {
+func getTestModel(b *testing.B) *litert.Model {
 	b.Helper()
 	modelPath := os.Getenv("LITERT_MODEL_PATH")
 	if modelPath == "" {
@@ -25,11 +25,11 @@ func getTestModel(b *testing.B) *embeddedllm.Model {
 		}
 	}
 
-	cfg := embeddedllm.DefaultConfig(modelPath)
-	cfg.Backend = embeddedllm.BackendCPU
+	cfg := litert.DefaultConfig(modelPath)
+	cfg.Backend = litert.BackendCPU
 	cfg.MaxSeqLen = 2048
 
-	m, err := embeddedllm.NewModel(context.Background(), cfg)
+	m, err := litert.NewModel(context.Background(), cfg)
 	if err != nil {
 		b.Fatalf("Failed to initialize model for benchmark: %v", err)
 	}

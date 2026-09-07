@@ -1,6 +1,6 @@
 # Benchmark CLI Tool (`cmd/benchmark`)
 
-The `cmd/benchmark` directory contains the CLI entrypoint for running Time To First Token (TTFT), token throughput, and memory benchmarks for `adk-embedded-litert`.
+The `cmd/benchmark` directory contains the CLI entrypoint for running Time To First Token (TTFT), token throughput, and memory benchmarks for `adk-litert`.
 
 For full benchmark results, metric definitions, and JSON schemas, see [**`pkg/benchmark/README.md`**](../../pkg/benchmark/README.md).
 

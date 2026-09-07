@@ -1,48 +1,48 @@
-// Package embeddedllm provides a low-latency, in-memory LiteRT-LM model engine
+// Package litert provides a low-latency, in-memory LiteRT-LM model engine
 // for the Google Agent Development Kit (ADK v2), built for scalable and real-time
 // in-process inference in Go.
 //
 // Usage:
 //
-//	import "github.com/benmizrahi/adk-embedded-litert"
+//	import "github.com/benmizrahi/adk-litert"
 //
-//	model, err := embeddedllm.NewModel(ctx, embeddedllm.DefaultConfig("/path/to/model.litertlm"))
-package embeddedllm
+//	model, err := litert.NewModel(ctx, litert.DefaultConfig("/path/to/model.litertlm"))
+package litert
 
 import (
 	"context"
 
-	"github.com/benmizrahi/adk-embedded-litert/internal/model/litert"
+	internallitert "github.com/benmizrahi/adk-litert/internal/model/litert"
 )
 
 // Hardware acceleration backend.
-type Backend = litert.Backend
+type Backend = internallitert.Backend
 
 const (
 	// BackendCPU runs inference entirely on the CPU.
-	BackendCPU = litert.BackendCPU
+	BackendCPU = internallitert.BackendCPU
 	// BackendGPU runs inference using GPU acceleration (OpenCL / Vulkan / Metal).
-	BackendGPU = litert.BackendGPU
+	BackendGPU = internallitert.BackendGPU
 )
 
-// Config defines options for initializing the embedded LiteRT model.
-type Config = litert.Config
+// Config defines options for initializing the LiteRT model.
+type Config = internallitert.Config
 
-// Model represents an embedded in-memory LiteRT-LM instance satisfying ADK model.LLM.
-type Model = litert.Model
+// Model represents an in-memory LiteRT-LM instance satisfying ADK model.LLM.
+type Model = internallitert.Model
 
 // NewModel loads a .litertlm model into memory and returns a model.LLM instance.
 func NewModel(ctx context.Context, config Config) (*Model, error) {
-	return litert.NewModel(ctx, config)
+	return internallitert.NewModel(ctx, config)
 }
 
 // DefaultConfig returns recommended baseline settings for LiteRT-LM.
 func DefaultConfig(modelPath string) Config {
-	return litert.DefaultConfig(modelPath)
+	return internallitert.DefaultConfig(modelPath)
 }
 
 // Register registers the LiteRT model loader with ADK's model registry.
 // Users can resolve models via model.NewLLM(ctx, "litert:/path/to/model.litertlm").
 func Register(pattern string, defaultCfg Config) {
-	litert.Register(pattern, defaultCfg)
+	internallitert.Register(pattern, defaultCfg)
 }

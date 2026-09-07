@@ -2,7 +2,7 @@
 # ==============================================================================
 # LiteRT-LM System-Wide Dependency Installer for Go
 # Usage:
-#   curl -sSL https://raw.githubusercontent.com/benmizrahi/adk-embedded-litert/main/scripts/install.sh | sudo bash
+#   curl -sSL https://raw.githubusercontent.com/benmizrahi/adk-litert/main/scripts/install.sh | sudo bash
 #   or:
 #   sudo ./scripts/install.sh
 # ==============================================================================
@@ -99,4 +99,4 @@ if [ "$OS" = "darwin" ]; then
 fi
 
 echo "==> Success! LiteRT-LM C runtime installed to $INSTALL_LIB_DIR"
-echo "==> Go packages can now import 'github.com/benmizrahi/adk-embedded-litert' and build with standard 'go build'."
+echo "==> Go packages can now import 'github.com/benmizrahi/adk-litert' and build with standard 'go build'."

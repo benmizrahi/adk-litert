@@ -10,7 +10,7 @@ import (
 	"google.golang.org/adk/v2/cmd/launcher"
 	"google.golang.org/adk/v2/cmd/launcher/full"
 
-	embeddedllm "github.com/benmizrahi/adk-embedded-litert"
+	"github.com/benmizrahi/adk-litert"
 )
 
 func main() {
@@ -25,14 +25,14 @@ func main() {
 		}
 	}
 
-	// 1. Initialize Embedded In-Memory LiteRT-LM Model
-	cfg := embeddedllm.DefaultConfig(modelPath)
+	// 1. Initialize In-Memory LiteRT-LM Model
+	cfg := litert.DefaultConfig(modelPath)
 	cfg.ModelName = "gemma-litert-local"
-	cfg.Backend = embeddedllm.BackendCPU
+	cfg.Backend = litert.BackendCPU
 
-	model, err := embeddedllm.NewModel(ctx, cfg)
+	model, err := litert.NewModel(ctx, cfg)
 	if err != nil {
-		log.Fatalf("Failed to initialize embedded LiteRT-LM model: %v", err)
+		log.Fatalf("Failed to initialize LiteRT-LM model: %v", err)
 	}
 	defer model.Close()
 

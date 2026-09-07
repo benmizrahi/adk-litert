@@ -1,15 +1,15 @@
-# adk-embedded-litert
+# adk-litert
 
-[![Go Reference](https://pkg.go.dev/badge/github.com/benmizrahi/adk-embedded-litert.svg)](https://pkg.go.dev/github.com/benmizrahi/adk-embedded-litert)
+[![Go Reference](https://pkg.go.dev/badge/github.com/benmizrahi/adk-litert.svg)](https://pkg.go.dev/github.com/benmizrahi/adk-litert)
 [![Go Version](https://img.shields.io/badge/Go-%3E%3D1.22-00ADD8?logo=go&logoColor=white)](https://golang.org)
 [![Google ADK](https://img.shields.io/badge/Google_ADK-v2-4285F4?logo=google&logoColor=white)](https://github.com/google/adk)
 [![LiteRT-LM](https://img.shields.io/badge/LiteRT--LM-v0.16.0-34A853)](https://github.com/google-ai-edge/LiteRT-LM)
 [![Model](https://img.shields.io/badge/Model-Gemma_3_270M-FF6F00?logo=huggingface&logoColor=white)](https://huggingface.co/litert-community/gemma-3-270m-it)
 [![Platform](https://img.shields.io/badge/Platform-Linux_%7C_macOS-lightgrey)]()
 
-**adk-embedded-litert** brings **low-latency, in-process LLM inference** directly into Go applications and [Google Agent Development Kit (ADK v2)](https://github.com/google/adk) agents.
+**adk-litert** brings **low-latency, in-process LLM inference** directly into Go applications and [Google Agent Development Kit (ADK v2)](https://github.com/google/adk) agents.
 
-While Google originally designed [LiteRT-LM](https://github.com/google-ai-edge/LiteRT-LM) for on-device mobile and edge computing, **adk-embedded-litert** repurposes its lightweight, self-contained C++ runtime for **scalable, real-time backend and server-side inference**—eliminating external daemon processes, network hops, and operational overhead.
+While Google originally designed [LiteRT-LM](https://github.com/google-ai-edge/LiteRT-LM) for on-device mobile and edge computing, **adk-litert** repurposes its lightweight, self-contained C++ runtime for **scalable, real-time backend and server-side inference**—eliminating external daemon processes, network hops, and operational overhead.
 
 ---
 
@@ -22,7 +22,7 @@ Most LLM production setups rely on separate model servers (e.g., vLLM, Ollama, T
 3. **Resource Overkill**: Calling heavy remote models for fast-path tasks (intent routing, classification, structured extraction, PII filtering) wastes cloud budgets and adds 200ms–1000ms roundtrips.
 
 ### The In-Memory Advantage
-**adk-embedded-litert** embeds LiteRT-LM directly into your Go process address space via Cgo:
+**adk-litert** embeds LiteRT-LM directly into your Go process address space via Cgo:
 - **Zero-Hop Execution**: Direct memory calls straight into C++ with no network, sockets, or JSON serialization.
 - **Sub-100ms TTFT**: Delivers **~90ms Time To First Token (TTFT)** and **~45 tok/s** on standard commodity CPU cores without requiring GPUs.
 - **Horizontal Scalability**: Scale out by simply deploying standard Go microservices or Kubernetes pods. Each instance carries its own self-contained in-memory intelligence (~470MB RAM footprint with Gemma 3 270M).
@@ -52,7 +52,7 @@ Most LLM production setups rely on separate model servers (e.g., vLLM, Ollama, T
 │       └── litert/          # Cgo wrapper and ADK model.LLM implementation
 ├── scripts/
 │   └── setup_deps.sh        # Automated fetcher for LiteRT prebuilts
-├── embeddedllm.go           # Public Go API surface
+├── litert.go                # Public Go API surface
 ├── Makefile                 # Build & run automation
 ├── go.mod                   # Go module definitions
 └── README.md
@@ -138,7 +138,7 @@ import (
 	"fmt"
 	"log"
 
-	embeddedllm "github.com/benmizrahi/adk-embedded-litert"
+	"github.com/benmizrahi/adk-litert"
 	"google.golang.org/adk/v2/model"
 	"google.golang.org/genai"
 )
@@ -147,13 +147,13 @@ func main() {
 	ctx := context.Background()
 
 	// 1. Configure the model
-	cfg := embeddedllm.DefaultConfig("/path/to/model.litertlm")
+	cfg := litert.DefaultConfig("/path/to/model.litertlm")
 	cfg.ModelName = "gemma-2b-local"
-	cfg.Backend = embeddedllm.BackendCPU // or embeddedllm.BackendGPU
+	cfg.Backend = litert.BackendCPU // or litert.BackendGPU
 	cfg.MaxSeqLen = 2048
 
 	// 2. Load model into memory
-	llm, err := embeddedllm.NewModel(ctx, cfg)
+	llm, err := litert.NewModel(ctx, cfg)
 	if err != nil {
 		log.Fatalf("Failed to load model: %v", err)
 	}
@@ -192,15 +192,15 @@ import (
 	"context"
 	"log"
 
-	embeddedllm "github.com/benmizrahi/adk-embedded-litert"
+	"github.com/benmizrahi/adk-litert"
 	"google.golang.org/adk/v2/agent/llmagent"
 )
 
 func main() {
 	ctx := context.Background()
 
-	cfg := embeddedllm.DefaultConfig("/path/to/model.litertlm")
-	modelInstance, err := embeddedllm.NewModel(ctx, cfg)
+	cfg := litert.DefaultConfig("/path/to/model.litertlm")
+	modelInstance, err := litert.NewModel(ctx, cfg)
 	if err != nil {
 		log.Fatalf("Model load failed: %v", err)
 	}
@@ -224,7 +224,7 @@ func main() {
 
 ```go
 // Register litert model scheme
-embeddedllm.Register("^(?i)litert:.*", embeddedllm.DefaultConfig(""))
+litert.Register("^(?i)litert:.*", litert.DefaultConfig(""))
 
 // Anywhere in your application:
 llm, err := model.NewLLM(ctx, "litert:/models/gemma-2b.litertlm")
@@ -238,7 +238,7 @@ llm, err := model.NewLLM(ctx, "litert:/models/gemma-2b.litertlm")
 Because this package interfaces with Google's native LiteRT-LM C runtime, install the prebuilt shared library (`liblitert-lm.so` on Linux, `liblitert-lm.dylib` on macOS) using our one-line installer:
 
 ```bash
-curl -sSL https://raw.githubusercontent.com/benmizrahi/adk-embedded-litert/main/scripts/install.sh | sudo bash
+curl -sSL https://raw.githubusercontent.com/benmizrahi/adk-litert/main/scripts/install.sh | sudo bash
 ```
 
 *(Or from a local clone: `sudo make install-deps`)*
@@ -247,7 +247,7 @@ curl -sSL https://raw.githubusercontent.com/benmizrahi/adk-embedded-litert/main/
 In your Go application directory:
 
 ```bash
-go get github.com/benmizrahi/adk-embedded-litert
+go get github.com/benmizrahi/adk-litert
 ```
 
 ### 3. Build Your Application

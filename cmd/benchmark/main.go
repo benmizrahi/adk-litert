@@ -8,8 +8,8 @@ import (
 	"os"
 	"strings"
 
-	embeddedllm "github.com/benmizrahi/adk-embedded-litert"
-	"github.com/benmizrahi/adk-embedded-litert/pkg/benchmark"
+	"github.com/benmizrahi/adk-litert"
+	"github.com/benmizrahi/adk-litert/pkg/benchmark"
 )
 
 func main() {
@@ -42,20 +42,20 @@ func main() {
 		}
 	}
 
-	backend := embeddedllm.BackendCPU
+	backend := litert.BackendCPU
 	if strings.ToLower(*backendFlag) == "gpu" {
-		backend = embeddedllm.BackendGPU
+		backend = litert.BackendGPU
 	}
 
 	ctx := context.Background()
 
-	cfg := embeddedllm.DefaultConfig(modelPath)
+	cfg := litert.DefaultConfig(modelPath)
 	cfg.Backend = backend
 	cfg.MaxSeqLen = *maxSeqLenFlag
 	cfg.ModelName = "litert-benchmark"
 
 	fmt.Printf("==> Loading LiteRT model from %s (%s)...\n", modelPath, *backendFlag)
-	model, err := embeddedllm.NewModel(ctx, cfg)
+	model, err := litert.NewModel(ctx, cfg)
 	if err != nil {
 		log.Fatalf("Failed to initialize model: %v", err)
 	}
